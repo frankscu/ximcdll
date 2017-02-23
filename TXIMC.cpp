@@ -11,7 +11,7 @@ TXIMC::TXIMC(){
     initXIMC();
 }
 
-int TXIMC::initXIMC(){
+bool TXIMC::initXIMC(){
     int names_count;
     int i;
     const int probe_devices=0;
@@ -34,7 +34,7 @@ int TXIMC::initXIMC(){
 
     if (names_count == 0){
         wprintf( L"No devices found\n" );
-        return 0;
+        return false;
     }else{
         strcpy( m_device_name, get_device_name( m_devenum, 0 ) );
 
@@ -50,7 +50,7 @@ int TXIMC::initXIMC(){
             wprintf( L"error opening device\n" );
         }
     }
-    return 1;
+    return true;
 }
 
 const wchar_t* TXIMC::error_string(result_t result){
@@ -119,25 +119,25 @@ get_position_t* TXIMC::GetPosition(device_t device){
     return the_get_position;
 }
 
-int TXIMC::GoLeft(device_t device){
+bool TXIMC::GoLeft(device_t device){
     result_t result;
     if ((result = command_left( device )) != result_ok){
         wprintf( L"error command left %ls\n", error_string( result ) );
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
-int TXIMC::GoRight(device_t device){
+bool TXIMC::GoRight(device_t device){
     result_t result;
     if ((result = command_right( device )) != result_ok){
         wprintf( L"error command right %ls\n", error_string( result ) );
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
-int TXIMC::Movr(device_t device, int shift=0, int ushift=0){
+bool TXIMC::Movr(device_t device, int shift=0, int ushift=0){
     result_t result;	
     status_t state;
 
@@ -152,27 +152,27 @@ int TXIMC::Movr(device_t device, int shift=0, int ushift=0){
 
 	if ((result = command_movr ( device, shift, ushift)) != result_ok){
 		wprintf( L"error command_movr %ls\n", error_string( result ) );
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
-int TXIMC::Stop(device_t device){
+bool TXIMC::Stop(device_t device){
     result_t result;
     if ((result = command_stop( device )) != result_ok){
 		wprintf( L"error command stop %ls\n", error_string( result ) );
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
-int TXIMC::GoHome(device_t device){
+bool TXIMC::GoHome(device_t device){
     result_t result;
     if ((result = command_home( device )) != result_ok){
 		wprintf( L"error command home %ls\n", error_string( result ) );
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 TXIMC::~TXIMC(){

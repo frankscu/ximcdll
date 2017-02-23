@@ -22,16 +22,16 @@ class TXIMC : public TObject{
     public:
         TXIMC();
         ~TXIMC();
-        int initXIMC();
+        bool initXIMC();
         const wchar_t* error_string(result_t result);
         void Print_state(device_t device);
         void Print_state(status_t* state);
         get_position_t*  GetPosition(device_t device);  
-        int  GoLeft(device_t device);
-        int  GoRight(device_t device);
-        int  Movr(device_t device, int shift, int ushift);
-        int  Stop(device_t device);
-        int  GoHome(device_t device);
+        bool  GoLeft(device_t device);
+        bool  GoRight(device_t device);
+        bool  Movr(device_t device, int shift, int ushift);
+        bool  Stop(device_t device);
+        bool  GoHome(device_t device);
         
         ClassDef(TXIMC,1)
     private:
