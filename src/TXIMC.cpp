@@ -28,28 +28,30 @@ bool TXIMC::initXIMC(){
 		names_count = 0;
 	}
 
-	for (i = 0; i < names_count; ++i){
-		wprintf( L"device: %hs\n", get_device_name( m_devenum, i ) );
-	}
-
     if (names_count == 0){
         wprintf( L"No devices found\n" );
         return false;
-    }else{
-        strcpy( m_device_name, get_device_name( m_devenum, 0 ) );
+    } 
 
-        free_enumerate_devices( m_devenum );
+    for (i = 0; i < names_count; ++i){
+        wprintf( L"device: %hs\n", get_device_name( m_devenum, i ) );
+    }
+    wprintf( L"\n\nOpening device...\n\n");
 
-        wprintf( L"\n\nOpening device...\n\n");
-
-        m_device = open_device( m_device_name );
-        wprintf( L"No.%d devices is openned\n", m_device);
+    for (i = 0; i < names_count; ++i){
+        strcpy( m_device_name, get_device_name( m_devenum, i ) );
         
-        if (m_device == device_undefined)
-        {
+        m_device = open_device( m_device_name );
+        memset(m_device_name,0,sizeof(m_device_name)/sizeof(char));
+        
+        if (m_device == device_undefined){
             wprintf( L"error opening device\n" );
+            return false;
+        } else{
+            wprintf( L"No.%d devices is openned\n", m_device);
         }
     }
+    free_enumerate_devices( m_devenum );
     return true;
 }
 
@@ -65,9 +67,9 @@ const wchar_t* TXIMC::error_string(result_t result){
 
 void TXIMC::Print_state(device_t device){
     result_t result;	
-	status_t *state;
+    status_t *state;
     state  = (status_t *)malloc(sizeof(status_t));
-  
+
     if ((result = get_status( device, state )) != result_ok)
         wprintf( L"error getting status: %ls\n", error_string( result ) );
 
@@ -88,7 +90,7 @@ void TXIMC::Print_state(device_t device){
 
 void TXIMC::Print_state(status_t* state){
     result_t result;	
-  
+
     wprintf( L" rpm: %d", state->CurSpeed );
     wprintf( L" pos: %d", state->CurPosition );
     wprintf( L" upwr: %d", state->Upwr );
@@ -112,7 +114,7 @@ get_position_t* TXIMC::GetPosition(device_t device){
     result_t result; 
     get_position_t *the_get_position;
     the_get_position  = (get_position_t *)malloc(sizeof(get_position_t));
-    
+
     if ((result = get_position( device, the_get_position )) != result_ok){
         wprintf( L"error get position %ls\n", error_string( result ) );
     }
@@ -130,16 +132,16 @@ bool TXIMC::GoLeft(device_t device){
 
 bool TXIMC::GoRight(device_t device){
     result_t result;
-    if ((result = command_right( device )) != result_ok){
-        wprintf( L"error command right %ls\n", error_string( result ) );
-        return false;
+        if ((result = command_right( device )) != result_ok){
+            wprintf( L"error command right %ls\n", error_string( result ) );
+            return false;
+        }
+        return true;
     }
-    return true;
-}
 
-bool TXIMC::Movr(device_t device, int shift=0, int ushift=0){
-    result_t result;	
-    status_t state;
+    bool TXIMC::Movr(device_t device, int shift, int ushift){
+        result_t result;	
+        status_t state;
 
     if ((result = get_status( device, &state )) != result_ok) {
 		wprintf( L"error getting status %ls\n", error_string( result ) );
@@ -152,6 +154,24 @@ bool TXIMC::Movr(device_t device, int shift=0, int ushift=0){
 
 	if ((result = command_movr ( device, shift, ushift)) != result_ok){
 		wprintf( L"error command_movr %ls\n", error_string( result ) );
+        return false;
+    }
+    return true;
+}
+
+bool TXIMC::GoPositions(device_t device, int positions, int upositions){
+    result_t result;	
+    status_t state;
+
+    if ((result = get_status( device, &state )) != result_ok) {
+		wprintf( L"error getting status %ls\n", error_string( result ) );
+        return false;
+	}
+    
+    Print_state( &state );
+
+	if ((result = command_move ( device, positions, upositions)) != result_ok){
+		wprintf( L"error command_move %ls\n", error_string( result ) );
         return false;
     }
     return true;
@@ -171,6 +191,17 @@ bool TXIMC::GoHome(device_t device){
     if ((result = command_home( device )) != result_ok){
 		wprintf( L"error command home %ls\n", error_string( result ) );
         return false;
+    }
+    return true;
+}
+
+bool TXIMC::SetDevice(device_t *device, device_t id){
+    if (id == device_undefined){
+        wprintf( L"error setting device %d\n", device );
+        return false;
+    } else{
+        *device = id;
+        wprintf( L"setting device %d done\n", *device );
     }
     return true;
 }

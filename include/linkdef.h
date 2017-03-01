@@ -6,4 +6,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class TXIMC;
+#pragma link C++ class TXIMCGUI;
+
 #endif

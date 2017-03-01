@@ -7,19 +7,18 @@
 //
 //  Liejian 15 Feb 2017
 //
-//#if defined(__APPLE__) && !defined(NOFRAMEWORK)
-//// include path to framework
-//#include <libximc/ximc.h>
-//#else
-//#include <ximc.h>
-//#endif
-#include "ximc/ximc.h"
+
+#include "../lib/ximc/ximc.h"
 
 #include "TObject.h"
 #include "TSystem.h"
 
 class TXIMC : public TObject{
     public:
+        device_t x_device=1;
+        device_t y_device=2;
+        device_t z_device=3;
+
         TXIMC();
         ~TXIMC();
         bool initXIMC();
@@ -29,14 +28,17 @@ class TXIMC : public TObject{
         get_position_t*  GetPosition(device_t device);  
         bool  GoLeft(device_t device);
         bool  GoRight(device_t device);
-        bool  Movr(device_t device, int shift, int ushift);
+        bool  GoPositions(device_t device, int positions, int upositions=0);
+        bool  Movr(device_t device, int shift, int ushift=0);
         bool  Stop(device_t device);
         bool  GoHome(device_t device);
-        
+        bool  SetDevice(device_t *device, device_t id);
+
         ClassDef(TXIMC,1)
+
     private:
-        device_enumeration_t m_devenum;
-        device_t m_device;
-        char m_device_name[256];
+       device_enumeration_t m_devenum;
+       device_t m_device;
+       char m_device_name[256];
 };
 #endif
